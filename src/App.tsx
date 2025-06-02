@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Sidebar } from "./components/Sidebar";
+import TaskListView from "./components/TaskListView";
 
 function App() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -15,7 +16,8 @@ function App() {
         brandName="Task Flow"
         onLogout={handleLogout}
       />
-      <main>
+      <main className="flex-1 overflow-y-auto">
+        <TaskListView />
       </main>
     </div>
   );
