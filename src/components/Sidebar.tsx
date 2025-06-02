@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { X, LogOut, Calendar, StickyNote, List, Plus, Settings, Search, ChevronRight } from 'lucide-react';
+import { X, LogOut, List, Plus, Settings, Search, ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -9,8 +9,6 @@ import { Input } from '@/components/ui/input';
 const tasks = [
   { name: 'Upcoming', icon: <ChevronRight />, count: 12, href: '/upcoming' },
   { name: 'Today', icon: <List />, count: 5, href: '/today', active: true },
-  { name: 'Calendar', icon: <Calendar />, href: '/calendar' },
-  { name: 'Sticky Wall', icon: <StickyNote />, href: '/sticky' },
 ];
 const lists = [
   { name: 'Personal', color: 'bg-red-400', count: 3, href: '/list/personal' },
