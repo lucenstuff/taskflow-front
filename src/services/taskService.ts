@@ -28,7 +28,6 @@ export const taskService = {
     await api.delete(`${BASE_PATH}/${id}`);
   },
 
-  // Additional endpoint from OpenAPI spec
   hello: async (): Promise<Record<string, string>> => {
     const response = await api.get<Record<string, string>>(`${BASE_PATH}/`);
     return response.data;

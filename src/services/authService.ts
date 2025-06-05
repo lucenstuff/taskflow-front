@@ -13,7 +13,6 @@ class AuthService {
       const { token } = response.data;
       this.setToken(token);
       
-      // Get and store user info
       const user = await this.getCurrentUser();
       this.setUser(user);
     } catch (error) {
@@ -27,7 +26,6 @@ class AuthService {
       const { token } = response.data;
       this.setToken(token);
       
-      // Get and store user info
       const user = await this.getCurrentUser();
       this.setUser(user);
     } catch (error) {
@@ -66,10 +64,9 @@ class AuthService {
     const token = this.getToken();
     if (!token) return false;
 
-    // Check if token is expired
     try {
       const payload = this.decodeToken(token);
-      const expiry = payload.exp * 1000; // Convert to milliseconds
+      const expiry = payload.exp * 1000;
       return expiry > Date.now();
     } catch {
       return false;

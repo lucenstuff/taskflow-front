@@ -55,7 +55,6 @@ api.interceptors.response.use(
     const originalRequest = error.config;
     
     if (error.response?.status === 401 && originalRequest) {
-      // On 401, logout the user
       authService.logout();
     }
 
