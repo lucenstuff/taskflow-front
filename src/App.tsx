@@ -1,13 +1,12 @@
-
-import './App.css'
+import { AuthProvider } from "./contexts/AuthContext";
+import {AppRoutes} from "./Routes";
 
 function App() {
-
   return (
-    <>
-      <span>Hello</span>
-    </>
-  )
+    <AuthProvider>
+      <AppRoutes />
+    </AuthProvider>
+  );
 }
 
-export default App
+export default App;
