@@ -1,12 +1,17 @@
 import { useState } from "react";
 import { Sidebar } from "./components/Sidebar";
 import TaskListView from "./components/TaskListView";
+import { AuthProvider, useAuth } from "./contexts/AuthContext";
 
-function App() {
+function AppContent() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const { logout } = useAuth();
 
   const handleMobileMenuClose = () => setIsMobileMenuOpen(false);
-  const handleLogout = () => console.log('logout');
+  const handleLogout = () => {
+    logout();
+    handleMobileMenuClose();
+  };
 
   return (
     <div className="flex h-screen">
@@ -20,6 +25,14 @@ function App() {
         <TaskListView />
       </main>
     </div>
+  );
+}
+
+function App() {
+  return (
+    <AuthProvider>
+      <AppContent />
+    </AuthProvider>
   );
 }
 
