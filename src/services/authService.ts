@@ -1,37 +1,39 @@
-import api from './apiConnection';
-import type { AuthRequest, AuthResponse, RegisterRequest, UserDTO } from '@/types';
+import api from "./apiConnection";
+import type {
+  AuthRequest,
+  AuthResponse,
+  RegisterRequest,
+  UserDTO,
+} from "@/types";
 
-const BASE_PATH = '/api/v1/auth';
+const BASE_PATH = "/api/v1/auth";
 
 class AuthService {
-  private static readonly TOKEN_KEY = 'auth_token';
-  private static readonly USER_KEY = 'user';
+  private static readonly TOKEN_KEY = "auth_token";
+  private static readonly USER_KEY = "user";
 
-  async login(credentials: AuthRequest): Promise<void> {
-    try {
-      const response = await api.post<AuthResponse>(`${BASE_PATH}/login`, credentials);
-      const { token } = response.data;
-      this.setToken(token);
-      
-      const user = await this.getCurrentUser();
-      this.setUser(user);
-    } catch (error) {
-      throw error;
-    }
-  }
+ async login(credentials: AuthRequest): Promise<void> {
+   const response = await api.post<AuthResponse>(
+     `${BASE_PATH}/login`,
+     credentials
+   );
+   const { token } = response.data;
+   this.setToken(token);
+   const user = await this.getCurrentUser();
+   this.setUser(user);
+ }
 
-  async register(data: RegisterRequest): Promise<void> {
-    try {
-      const response = await api.post<AuthResponse>(`${BASE_PATH}/register`, data);
-      const { token } = response.data;
-      this.setToken(token);
-      
-      const user = await this.getCurrentUser();
-      this.setUser(user);
-    } catch (error) {
-      throw error;
-    }
-  }
+ async register(data: RegisterRequest): Promise<void> {
+   const response = await api.post<AuthResponse>(
+     `${BASE_PATH}/register`,
+     data
+   );
+   const { token } = response.data;
+   this.setToken(token);
+ 
+   const user = await this.getCurrentUser();
+   this.setUser(user);
+ }
 
   async getCurrentUser(): Promise<UserDTO> {
     const response = await api.get<UserDTO>(`${BASE_PATH}/me`);
@@ -73,10 +75,10 @@ class AuthService {
     }
   }
 
-  private decodeToken(token: string): any {
+  private decodeToken(token: string)  {
     try {
-      const base64Url = token.split('.')[1];
-      const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+      const base64Url = token.split(".")[1];
+      const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
       return JSON.parse(window.atob(base64));
     } catch {
       return null;
@@ -84,4 +86,4 @@ class AuthService {
   }
 }
 
-export const authService = new AuthService(); 
+export const authService = new AuthService();
