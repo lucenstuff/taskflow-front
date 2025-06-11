@@ -1,9 +1,9 @@
 import { Sidebar } from "@/components/Sidebar";
 import { useState } from "react";
 import type { ReactNode } from "react";
-import { useNavigate } from "react-router-dom";
+import { Outlet, useNavigate } from "react-router-dom";
 
-export const TaskLayout = ({ children }: { children: ReactNode }) => {
+export const TaskLayout = (): ReactNode => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const navigate = useNavigate();
@@ -17,7 +17,7 @@ export const TaskLayout = ({ children }: { children: ReactNode }) => {
   };
 
   return (
-    <>
+    <div className="flex flex-col h-screen">
       <Sidebar
         isMobileMenuOpen={isMobileMenuOpen}
         onMobileMenuClose={handleMobileMenuClose}
@@ -25,7 +25,7 @@ export const TaskLayout = ({ children }: { children: ReactNode }) => {
         brandName="Task Flow"
         onLogout={handleLogout}
       />
-      {children}
-    </>
+      <Outlet />
+    </div>
   );
 };

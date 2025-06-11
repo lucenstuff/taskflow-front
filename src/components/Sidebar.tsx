@@ -153,7 +153,7 @@ export function Sidebar({
 
       {isMobileMenuOpen && (
         <div
-          className="fixed inset-0 bg-black/50 z-40 lg:hidden"
+          className="fixed inset-0 bg-black/50 z-40 md:hidden"
           onClick={onMobileMenuClose}
           aria-hidden="true"
         />
@@ -161,14 +161,14 @@ export function Sidebar({
 
       <div
         className={cn(
-          "fixed inset-y-0 left-0 z-50 w-64 bg-background transform transition-transform duration-200 ease-in-out lg:hidden",
+          "fixed inset-y-0 left-0 z-50 w-64 bg-background transform transition-transform duration-200 ease-in-out md:hidden",
           isMobileMenuOpen ? "translate-x-0" : "-translate-x-full"
         )}
       >
         <SidebarContent onClose={onMobileMenuClose} />
       </div>
 
-      <div className="fixed inset-y-0 left-0 z-30 hidden lg:flex flex-col w-64 bg-background border-r border-border">
+      <div className="fixed inset-y-0 left-0 z-30 hidden md:flex flex-col w-64 bg-background border-r border-border">
         <SidebarContent />
       </div>
     </>

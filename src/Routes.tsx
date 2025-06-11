@@ -13,14 +13,15 @@ export function AppRoutes() {
         <Route path="/login" element={<Login />} />
       </Route>
       <Route
-        path="/"
         element={
           <ProtectedRoute>
-            <TaskLayout children={<GroupTaskUpcoming />} />
+            <TaskLayout />
           </ProtectedRoute>
         }
-      ></Route>
-      <Route path="/register" element={<Register />}></Route>
+      >
+        <Route path="/" element={<GroupTaskUpcoming />} />
+      </Route>
+      <Route path="/register" element={<Register />} />
     </Routes>
   );
 }
