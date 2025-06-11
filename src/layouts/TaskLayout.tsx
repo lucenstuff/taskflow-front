@@ -17,7 +17,7 @@ export const TaskLayout = (): ReactNode => {
   };
 
   return (
-    <div className="flex flex-col h-screen">
+    <div className="flex h-screen flex-col md:flex-row min-h-0">
       <Sidebar
         isMobileMenuOpen={isMobileMenuOpen}
         onMobileMenuClose={handleMobileMenuClose}
@@ -25,7 +25,9 @@ export const TaskLayout = (): ReactNode => {
         brandName="Task Flow"
         onLogout={handleLogout}
       />
-      <Outlet />
+      <main className="flex-1 overflow-y-auto bg-background p-4">
+        <Outlet />
+      </main>
     </div>
   );
 };
