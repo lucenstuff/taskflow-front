@@ -1,29 +1,30 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { X, LogOut, List, ChevronRight, Menu } from "lucide-react";
+import { X, LogOut, Menu } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { tagService } from "@/services/tagService";
+import { useEffect, useState } from "react";
+import type { TagDTO } from "@/types";
 
 const tasks = [
   {
     name: "Próximas Tareas",
-    icon: <ChevronRight />,
     count: 12,
     href: "/upcoming",
   },
   {
     name: "Tareas de Hoy",
-    icon: <List />,
     count: 5,
     href: "/today",
   },
 ];
 
-const tags = [
-  { name: "🏠 Hogar", color: "bg-cyan-100 text-cyan-900" },
-  { name: "🎉 Cumpleaños", color: "bg-red-100 text-red-900" },
-  { name: "📚 Estudio", color: "bg-yellow-100 text-yellow-900" },
-  { name: "💼 Trabajo", color: "bg-blue-100 text-blue-900" },
-];
+// const tags = [
+//   { name: "🏠 Hogar", color: "bg-cyan-100 text-cyan-900" },
+//   { name: "🎉 Cumpleaños", color: "bg-red-100 text-red-900" },
+//   { name: "📚 Estudio", color: "bg-yellow-100 text-yellow-900" },
+//   { name: "💼 Trabajo", color: "bg-blue-100 text-blue-900" },
+// ];
 
 interface SidebarProps {
   isMobileMenuOpen: boolean;
@@ -44,6 +45,12 @@ export function Sidebar({
   const navigate = useNavigate();
 
   const isActive = (href: string) => location.pathname === href;
+
+  const [tags, setTags] = useState<TagDTO[]>([]);
+
+  useEffect(() => {
+    tagService.getAll().then(setTags);
+  }, []);
 
   const handleLogout = () => {
     localStorage.clear();
@@ -86,7 +93,6 @@ export function Sidebar({
             )}
             onClick={onClose}
           >
-            <span className="mr-3">{task.icon}</span>
             <span className="flex-1">{task.name}</span>
             {task.count !== undefined && (
               <span className="ml-2 bg-muted text-xs rounded px-2 py-0.5 font-semibold">
@@ -106,7 +112,7 @@ export function Sidebar({
             key={tag.name}
             className={cn(
               "inline-flex items-center px-3 py-2 text-xs font-medium rounded-full mr-2 mb-2",
-              tag.color
+              `bg-${tag.color}-100`,
             )}
           >
             {tag.name}
