@@ -4,36 +4,46 @@ import { authService } from "@/services/authService";
 import type { AuthRequest, RegisterRequest, UserDTO } from "@/types";
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<UserDTO | null>(null);
+  const [user, setUser] = useState<UserDTO | null>(() => authService.getUser());
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const initializeAuth = async () => {
-      setIsLoading(true);
-      try {
-        const token = authService.getToken();
-        if (token && authService.isAuthenticated()) {
-          const currentUser = await authService.getCurrentUser();
-          setUser(currentUser);
-        } else {
-          setUser(null);
-        }
-      } catch {
-        setUser(null);
-        authService.logout();
-      } finally {
-        setIsLoading(false);
+    const handleStorage = (event: StorageEvent) => {
+      if (event.key === "auth_token" || event.key === "user") {
+        setUser(authService.getUser());
       }
     };
-    initializeAuth();
+    window.addEventListener("storage", handleStorage);
+    return () => window.removeEventListener("storage", handleStorage);
+  }, []);
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      const token = authService.getToken();
+      if (token && authService.isAuthenticated()) {
+        const localUser = authService.getUser();
+        if (localUser) {
+          setUser(localUser);
+        } else {
+          const refreshedUser = await authService.refreshUser();
+          setUser(refreshedUser);
+        }
+      } else {
+        authService.logout();
+        setUser(null);
+      }
+      setIsLoading(false);
+    };
+
+    checkAuth();
   }, []);
 
   const login = async (credentials: AuthRequest) => {
     setIsLoading(true);
     try {
+      authService.logout(); // limpio estado previo
       await authService.login(credentials);
-      const currentUser = await authService.getCurrentUser();
-      setUser(currentUser);
+      setUser(authService.getUser());
     } finally {
       setIsLoading(false);
     }
@@ -43,8 +53,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setIsLoading(true);
     try {
       await authService.register(data);
-      const currentUser = await authService.getCurrentUser();
-      setUser(currentUser);
+      setUser(authService.getUser());
     } finally {
       setIsLoading(false);
     }
