@@ -1,5 +1,5 @@
 import { Toaster } from "sonner";
-import { AuthProvider } from "./contexts/AuthContext";
+import { AuthProvider } from "./components/providers/AuthContextProvider";
 import { AppRoutes } from "./Routes";
 
 function App() {
