@@ -4,6 +4,7 @@ import Login from "./components/Login";
 import { TaskLayout } from "./layouts/TaskLayout";
 import GroupTaskUpcoming from "./components/GroupTaskUpcoming";
 import Register from "./components/Register";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 export function AppRoutes() {
   return (
@@ -13,7 +14,11 @@ export function AppRoutes() {
       </Route>
       <Route
         path="/"
-        element={<TaskLayout children={<GroupTaskUpcoming />} />}
+        element={
+          <ProtectedRoute>
+            <TaskLayout children={<GroupTaskUpcoming />} />
+          </ProtectedRoute>
+        }
       ></Route>
       <Route path="/register" element={<Register />}></Route>
     </Routes>

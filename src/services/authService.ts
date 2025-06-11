@@ -18,6 +18,9 @@ class AuthService {
      credentials
    );
    const { token } = response.data;
+   if (!token) {
+     throw new Error("Authentication token is missing in the response.");
+   }
    this.setToken(token);
    const user = await this.getCurrentUser();
    this.setUser(user);
@@ -29,6 +32,9 @@ class AuthService {
      data
    );
    const { token } = response.data;
+   if (!token) {
+     throw new Error("Authentication token is missing in the response.");
+   }
    this.setToken(token);
  
    const user = await this.getCurrentUser();
