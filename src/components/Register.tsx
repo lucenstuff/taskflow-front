@@ -39,7 +39,7 @@ function Register() {
         email,
         password,
       });
-      toast.success("Registro exitoso. Bienvenido a Tax Flow!");
+      toast.success("Registro exitoso. Bienvenido a Task Flow!");
       navigate("/");
     } catch (error) {
       console.error("Error al registrarse:", error);
