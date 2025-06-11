@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { authService } from "@/services/authService";
 
 function Register() {
   const [name, setName] = useState<string>("");
@@ -23,11 +24,28 @@ function Register() {
     setIsLoading(true);
 
     try {
-      console.log("Register attempt", { name, lastname, email, password });
+      if (password !== password_confirmation) {
+        alert("Las contraseñas no coinciden");
+        setIsLoading(false);
+        return;
+      }
+      await authService.register({
+        firstName: name,
+        lastName: lastname,
+        email,
+        password,
+      });
+      alert("Registro exitoso. Por favor, inicie sesión.");
     } catch (error) {
-      console.error("Register failed", error);
+      console.error("Error al registrarse:", error);
+      alert("Error al registrarse. Por favor, inténtelo de nuevo más tarde.");
     } finally {
       setIsLoading(false);
+      setName("");
+      setLastname("");
+      setEmail("");
+      setPassword("");
+      setPasswordConfirmation("");
     }
   };
 
@@ -35,7 +53,7 @@ function Register() {
     <div className="flex items-center justify-center min-h-screen bg-background shadow-lg">
       <Card className="w-[400px]">
         <CardHeader className="text-center">
-          <CardTitle className="text-2x1 font-bold">Taxt Flow</CardTitle>
+          <CardTitle className="text-2xl font-bold">Taxt Flow</CardTitle>
           <CardDescription>Registrarse</CardDescription>
         </CardHeader>
         <form onSubmit={handleSubmit}>
@@ -45,12 +63,12 @@ function Register() {
                 htmlFor="name"
                 className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
               >
-                Name:
+                Nombre:
               </label>
               <Input
                 id="name"
                 type="name"
-                placeholder="Name"
+                placeholder="Juan"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 disabled={isLoading}
@@ -62,12 +80,12 @@ function Register() {
                 htmlFor="lastname"
                 className="text-sm font-medium leading-none peer-desabled:cursor-not-allowed peer-disabled:opacity-70"
               >
-                Lastname:
+                Apellido:
               </label>
               <Input
                 id="lastname"
                 type="lastname"
-                placeholder="Lastname"
+                placeholder="Perez"
                 value={lastname}
                 onChange={(e) => setLastname(e.target.value)}
                 disabled={isLoading}
@@ -84,7 +102,7 @@ function Register() {
               <Input
                 id="email"
                 type="email"
-                placeholder="email"
+                placeholder="usuario@ejemplo.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 disabled={isLoading}
@@ -96,12 +114,12 @@ function Register() {
                 htmlFor="lastname"
                 className="text-sm font-medium leading-none peer-desabled:cursor-not-allowed peer-disabled:opacity-70"
               >
-                Password:
+                Contraseña:
               </label>
               <Input
                 id="password"
                 type="password"
-                placeholder="password"
+                placeholder="Contraseña"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 disabled={isLoading}
@@ -113,12 +131,12 @@ function Register() {
                 htmlFor="lastname"
                 className="text-sm font-medium leading-none peer-desabled:cursor-not-allowed peer-disabled:opacity-70"
               >
-                Repeat Password:
+                Repetir Contraseña:
               </label>
               <Input
                 id="password_confirmation"
-                type="password_confirmation"
-                placeholder="password_confirmation"
+                type="password"
+                placeholder="Confirmar Contraseña"
                 value={password_confirmation}
                 onChange={(e) => setPasswordConfirmation(e.target.value)}
                 disabled={isLoading}
@@ -128,13 +146,13 @@ function Register() {
           </CardContent>
           <CardFooter className="pt-8">
             <Button type="submit" className="w-full" disabled={isLoading}>
-                {isLoading ? "Resgistrando..." : "Registrarse"}
+              {isLoading ? "Resgistrando..." : "Registrarse"}
             </Button>
           </CardFooter>
         </form>
       </Card>
     </div>
-  )
+  );
 }
 
 export default Register;
