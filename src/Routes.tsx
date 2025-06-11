@@ -2,9 +2,9 @@ import { Routes, Route } from "react-router-dom";
 import AuthLayout from "./layouts/AuthLayout";
 import Login from "./components/Login";
 import { TaskLayout } from "./layouts/TaskLayout";
-import GroupTaskUpcoming from "./components/GroupTaskUpcoming";
 import Register from "./components/Register";
 import ProtectedRoute from "./components/ProtectedRoute";
+import TodayTasks from "./components/TodayTasks";
 
 export function AppRoutes() {
   return (
@@ -19,7 +19,7 @@ export function AppRoutes() {
           </ProtectedRoute>
         }
       >
-        <Route path="/" element={<GroupTaskUpcoming />} />
+        <Route path="/" element={<TodayTasks />} />
       </Route>
       <Route path="/register" element={<Register />} />
     </Routes>
