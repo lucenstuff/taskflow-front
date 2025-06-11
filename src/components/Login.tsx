@@ -10,27 +10,29 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
-import { authService } from "@/services/authService";
+import { useNavigate, Link } from "react-router-dom";
+import { useAuth } from "@/hooks/useAuth";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
 
 function Login() {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const navigate = useNavigate();
+  const { login } = useAuth();
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
     setIsLoading(true);
 
     try {
-      await authService.login({ email, password });
+      await login({ email, password });
       toast.success("Inicio de sesión exitoso. Bienvenido a Task Flow!");
+      setEmail("");
+      setPassword("");
       navigate("/");
     } catch (error) {
       console.error("Error al iniciar sesión:", error);
-
       let apiMessage =
         "Error al iniciar sesión. Por favor, inténtelo de nuevo más tarde.";
       if (axios.isAxiosError(error)) {
@@ -42,12 +44,9 @@ function Login() {
       } else if (error instanceof Error) {
         apiMessage = error.message || apiMessage;
       }
-
       toast.error(apiMessage);
     } finally {
       setIsLoading(false);
-      setEmail("");
-      setPassword("");
     }
   };
 
@@ -63,7 +62,7 @@ function Login() {
             <div className="space-y-2">
               <label
                 htmlFor="email"
-                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                className="text-sm font-medium leading-none"
               >
                 Email:
               </label>
@@ -80,7 +79,7 @@ function Login() {
             <div className="space-y-2">
               <label
                 htmlFor="password"
-                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                className="text-sm font-medium leading-none"
               >
                 Contraseña:
               </label>
@@ -98,15 +97,15 @@ function Login() {
             <Button type="submit" className="w-full" disabled={isLoading}>
               {isLoading ? "Iniciando sesión..." : "Iniciar sesión"}
             </Button>
-            <div className="flex flex-col items-center justify-center text-sm text-muted-foreground mt-2">
+            <div className="text-sm text-muted-foreground text-center">
               <span>
                 ¿No tienes una cuenta?{" "}
-                <a
-                  href="/register"
+                <Link
+                  to="/register"
                   className="text-primary underline hover:text-primary/80 transition-colors font-medium"
                 >
                   Regístrate aquí
-                </a>
+                </Link>
               </span>
             </div>
           </CardFooter>
