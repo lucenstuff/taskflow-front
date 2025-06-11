@@ -168,7 +168,7 @@ export function Sidebar({
         <SidebarContent onClose={onMobileMenuClose} />
       </div>
 
-      <div className="fixed inset-y-0 left-0 z-30 hidden md:flex flex-col w-64 bg-background border-r border-border">
+      <div className="inset-y-0 left-0 z-30 hidden md:flex flex-col w-64 bg-background border-r border-border">
         <SidebarContent />
       </div>
     </>
