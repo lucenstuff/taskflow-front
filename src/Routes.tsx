@@ -4,7 +4,8 @@ import Login from "./components/Login";
 import { TaskLayout } from "./layouts/TaskLayout";
 import Register from "./components/Register";
 import ProtectedRoute from "./components/ProtectedRoute";
-import TodayTasks from "./components/TodayTasks";
+import Tasks from "./components/Tasks";
+
 
 export function AppRoutes() {
   return (
@@ -19,7 +20,7 @@ export function AppRoutes() {
           </ProtectedRoute>
         }
       >
-        <Route path="/" element={<TodayTasks />} />
+        <Route path="/" element={<Tasks />} />
       </Route>
       <Route path="/register" element={<Register />} />
     </Routes>
