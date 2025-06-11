@@ -10,6 +10,9 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { authService } from "@/services/authService";
+import { toast } from "sonner";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 function Register() {
   const [name, setName] = useState<string>("");
@@ -18,6 +21,7 @@ function Register() {
   const [password, setPassword] = useState<string>("");
   const [password_confirmation, setPasswordConfirmation] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const navigate = useNavigate();
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -25,7 +29,7 @@ function Register() {
 
     try {
       if (password !== password_confirmation) {
-        alert("Las contraseñas no coinciden");
+        toast.error("Las contraseñas no coinciden.");
         setIsLoading(false);
         return;
       }
@@ -35,10 +39,25 @@ function Register() {
         email,
         password,
       });
-      alert("Registro exitoso. Por favor, inicie sesión.");
+      toast.success("Registro exitoso. Bienvenido a Tax Flow!");
+      navigate("/");
     } catch (error) {
       console.error("Error al registrarse:", error);
-      alert("Error al registrarse. Por favor, inténtelo de nuevo más tarde.");
+
+      let apiMessage =
+        "Error al registrarse. Por favor, inténtelo de nuevo más tarde.";
+
+      if (axios.isAxiosError(error)) {
+        apiMessage =
+          error.response?.data?.message ||
+          error.response?.data?.error ||
+          error.message ||
+          apiMessage;
+      } else if (error instanceof Error) {
+        apiMessage = error.message || apiMessage;
+      }
+
+      toast.error(apiMessage);
     } finally {
       setIsLoading(false);
       setName("");
@@ -53,7 +72,7 @@ function Register() {
     <div className="flex items-center justify-center min-h-screen bg-background shadow-lg">
       <Card className="w-[400px]">
         <CardHeader className="text-center">
-          <CardTitle className="text-2xl font-bold">Taxt Flow</CardTitle>
+          <CardTitle className="text-2xl font-bold">Task Flow</CardTitle>
           <CardDescription>Registrarse</CardDescription>
         </CardHeader>
         <form onSubmit={handleSubmit}>
