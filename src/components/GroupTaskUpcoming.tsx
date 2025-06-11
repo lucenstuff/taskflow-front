@@ -80,7 +80,7 @@ function GroupTaskUpcoming() {
       <div className="mb-4 sm:mb-6">
         <div className="flex flex-col sm:flex-row gap-2">
           <Input
-            placeholder="Add New Task"
+            placeholder="Añadir etiqueta"
             onKeyDown={(e) => e.key === "Enter"}
             className="flex-1"
           />
