@@ -10,4 +10,5 @@ export interface RegisterRequest extends AuthRequest {
 
 export interface AuthResponse {
   token: string;
-} 
+  message?: string;
+}
