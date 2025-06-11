@@ -39,6 +39,7 @@ function Register() {
         email,
         password,
       });
+      await authService.login({ email, password });
       toast.success("Registro exitoso. Bienvenido a Task Flow!");
       navigate("/");
     } catch (error) {
