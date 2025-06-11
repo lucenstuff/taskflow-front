@@ -1,8 +1,7 @@
-import { Link, useLocation } from "react-router-dom";
-import { X, LogOut, List, ChevronRight } from "lucide-react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { X, LogOut, List, ChevronRight, Menu } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { useNavigate } from "react-router-dom";
 
 const tasks = [
   {
@@ -16,9 +15,9 @@ const tasks = [
     icon: <List />,
     count: 5,
     href: "/today",
-    active: true,
   },
 ];
+
 const tags = [
   { name: "🏠 Hogar", color: "bg-cyan-100 text-cyan-900" },
   { name: "🎉 Cumpleaños", color: "bg-red-100 text-red-900" },
@@ -29,6 +28,7 @@ const tags = [
 interface SidebarProps {
   isMobileMenuOpen: boolean;
   onMobileMenuClose: () => void;
+  onMobileMenuToggle: () => void;
   brandName: string;
   onLogout?: () => void;
 }
@@ -36,6 +36,7 @@ interface SidebarProps {
 export function Sidebar({
   isMobileMenuOpen,
   onMobileMenuClose,
+  onMobileMenuToggle,
   brandName,
   onLogout,
 }: SidebarProps) {
@@ -45,7 +46,7 @@ export function Sidebar({
   const isActive = (href: string) => location.pathname === href;
 
   const handleLogout = () => {
-    localStorage.clear(); 
+    localStorage.clear();
     onLogout?.();
     onMobileMenuClose();
     navigate("/login");
@@ -62,12 +63,13 @@ export function Sidebar({
             variant="ghost"
             size="icon"
             onClick={onClose}
-            aria-label="Close menu"
+            aria-label="Cerrar menú"
           >
             <X className="w-5 h-5 text-muted-foreground" />
           </Button>
         )}
       </div>
+
       <div className="px-4 pt-2 pb-1 font-semibold text-muted-foreground tracking-widest">
         Tareas:
       </div>
@@ -82,6 +84,7 @@ export function Sidebar({
                 ? "bg-primary/10 text-primary"
                 : "text-muted-foreground hover:bg-muted"
             )}
+            onClick={onClose}
           >
             <span className="mr-3">{task.icon}</span>
             <span className="flex-1">{task.name}</span>
@@ -93,6 +96,7 @@ export function Sidebar({
           </Link>
         ))}
       </div>
+
       <div className="px-4 pt-2 pb-1 font-semibold text-muted-foreground tracking-widest">
         Tus Etiquetas:
       </div>
@@ -114,6 +118,7 @@ export function Sidebar({
           </Link>
         </span>
       </div>
+
       <div className="flex-1" />
       <div className="px-2 pb-2 mt-4">
         <Button
@@ -131,6 +136,15 @@ export function Sidebar({
 
   return (
     <>
+      <div className="flex items-center justify-center p-4 border-b border-border md:hidden">
+        <button onClick={onMobileMenuToggle} aria-label="Abrir menú">
+          <Menu className="w-6 h-6 text-primary" />
+        </button>
+        <span className="font-bold text-lg whitespace-nowrap text-primary flex-1 text-center">
+          {brandName}
+        </span>
+      </div>
+
       {isMobileMenuOpen && (
         <div
           className="fixed inset-0 bg-black/50 z-40 lg:hidden"
@@ -138,6 +152,7 @@ export function Sidebar({
           aria-hidden="true"
         />
       )}
+
       <div
         className={cn(
           "fixed inset-y-0 left-0 z-50 w-64 bg-background transform transition-transform duration-200 ease-in-out lg:hidden",
@@ -146,6 +161,7 @@ export function Sidebar({
       >
         <SidebarContent onClose={onMobileMenuClose} />
       </div>
+
       <div className="fixed inset-y-0 left-0 z-30 hidden lg:flex flex-col w-64 bg-background border-r border-border">
         <SidebarContent />
       </div>
