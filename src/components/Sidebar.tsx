@@ -1,10 +1,12 @@
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { X, LogOut, Menu } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { tagService } from "@/services/tagService";
 import { useEffect, useState } from "react";
 import type { TagDTO } from "@/types";
+import { authService } from "@/services/authService";
+import { useNavigate } from "react-router-dom";
 
 const tasks = [
   {
@@ -39,12 +41,10 @@ export function Sidebar({
   onMobileMenuClose,
   onMobileMenuToggle,
   brandName,
-  onLogout,
 }: SidebarProps) {
   const location = useLocation();
-  const navigate = useNavigate();
-
   const isActive = (href: string) => location.pathname === href;
+  const navigate = useNavigate();
 
   const [tags, setTags] = useState<TagDTO[]>([]);
 
@@ -53,9 +53,7 @@ export function Sidebar({
   }, []);
 
   const handleLogout = () => {
-    localStorage.clear();
-    onLogout?.();
-    onMobileMenuClose();
+    authService.logout();
     navigate("/login");
   };
 
@@ -112,7 +110,7 @@ export function Sidebar({
             key={tag.name}
             className={cn(
               "inline-flex items-center px-3 py-2 text-xs font-medium rounded-full mr-2 mb-2",
-              `bg-${tag.color}-100`,
+              `bg-${tag.color}-100`
             )}
           >
             {tag.name}
