@@ -3,6 +3,7 @@ import TodayTasks from "./TodayTasks"; // ajusta la ruta según tu proyecto
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import NextTasks from "./NextTasks";
+import NewTaskModal from "./NewTaskModal";
 
 const initialTasks = [
   {
@@ -31,6 +32,7 @@ const initialTasks = [
 export default function TasksPage() {
   const [tasks, setTasks] = useState(initialTasks);
   const [newTask, setNewTask] = useState("");
+  const [showNewTaskModal ,setShowNewTaskModal] = useState(false);
 
   const handleAddTask = () => {
     if (!newTask.trim()) return;
@@ -56,6 +58,7 @@ export default function TasksPage() {
   };
 
   return (
+  <>
     <div className="w-full space-y-4">
       <div className="flex items-center gap-2 justify-start mb-4">
         <h1 className="text-2xl sm:text-3xl font-bold">Tareas</h1>
@@ -86,5 +89,12 @@ export default function TasksPage() {
       <TodayTasks tasks={tasks} onToggleTask={handleToggleTask} />
       <NextTasks tasks={tasks} onToggleTask={handleToggleTask} />
     </div>
+    {showNewTaskModal && (
+        <NewTaskModal
+          onClose={() => setShowNewTaskModal(false)}
+          onCreate={handleAddTask}
+        />
+      )}
+  </> 
   );
 }
