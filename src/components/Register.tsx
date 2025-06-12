@@ -39,8 +39,8 @@ function Register() {
         email,
         password,
       });
-      toast.success("Registro exitoso. Bienvenido a Task Flow!");
-      navigate("/");
+      toast.success("Registro exitoso. Por favor Inicie Sesión!");
+      navigate("/login");
     } catch (error) {
       console.error("Error al registrarse:", error);
 
