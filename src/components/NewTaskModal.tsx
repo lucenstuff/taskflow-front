@@ -41,7 +41,7 @@ export default function NewTaskModal({
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [priority, setPriority] = useState<TaskPriority | "">("");
-  const [selectedTagId, setSelectedTagId] = useState<number | null>(null);
+  const [selectedTagIds, setSelectedTagIds] = useState<number[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
   const [availableTags, setAvailableTags] = useState<TagDTO[]>([]);
@@ -78,20 +78,20 @@ export default function NewTaskModal({
     setIsLoading(true);
 
     try {
-      const tagIds = selectedTagId ? [selectedTagId] : [];
+      const tagIds = selectedTagIds;
       await taskService.createTask({
         title,
         description,
         priority: priority as TaskPriority,
         due_date: new Date().toISOString(),
         status: "IN_PROGRESS" as TaskStatus,
-        tags: availableTags.filter((tag) => tagIds.includes(tag.id!)), 
+        tags: availableTags.filter((tag) => tagIds.includes(tag.id!)),
       });
 
       setTitle("");
       setDescription("");
       setPriority("");
-      setSelectedTagId(null);
+      setSelectedTagIds([]);
       onTaskCreated();
       onClose();
     } catch (error) {
@@ -177,28 +177,66 @@ export default function NewTaskModal({
               >
                 Etiquetas:
               </label>
-              <Select
-                onValueChange={(value) => setSelectedTagId(Number(value))}
-                disabled={availableTags.length <= 0}
-                value={selectedTagId ? String(selectedTagId) : ""}
-              >
-                <SelectTrigger className="w-full">
-                  <SelectValue
-                    placeholder={
-                      availableTags.length > 0
-                        ? "Selecciona etiquetas disponibles"
-                        : "No hay etiquetas disponibles"
-                    }
-                  />
-                </SelectTrigger>
-                <SelectContent>
-                  {availableTags.map((t) => (
-                    <SelectItem key={t.id} value={String(t.id)}>
-                      {t.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <div>
+                <Select
+                  open={undefined}
+                  onOpenChange={undefined}
+                  disabled={availableTags.length <= 0}
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue
+                      placeholder={
+                        availableTags.length > 0
+                          ? "Selecciona etiquetas disponibles"
+                          : "No hay etiquetas disponibles"
+                      }
+                    />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {availableTags.map((t) => (
+                      <div
+                        key={t.id}
+                        className="flex items-center px-2 py-1 cursor-pointer hover:bg-accent"
+                        onClick={() => {
+                          setSelectedTagIds((prev) =>
+                            prev.includes(t.id!)
+                              ? prev.filter((id) => id !== t.id)
+                              : [...prev, t.id!]
+                          );
+                        }}
+                      >
+                        <input
+                          type="checkbox"
+                          checked={selectedTagIds.includes(t.id!)}
+                          readOnly
+                          className="mr-2"
+                        />
+                        <span>{t.name}</span>
+                      </div>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {selectedTagIds.length > 0 && (
+                <div className="flex flex-wrap gap-2 mt-2">
+                  {availableTags
+                    .filter((t) => selectedTagIds.includes(t.id!))
+                    .map((t) => (
+                      <div key={t.name} className="relative mr-2 mb-2">
+                        <div className="relative inline-flex items-center text-xs font-medium rounded-md">
+                          <span
+                            className="absolute inset-0 rounded-sm"
+                            style={{ backgroundColor: t.color, opacity: 0.5 }}
+                          />
+                          <span className="relative z-10 flex items-center px-2 py-2 gap-1 rounded-sm">
+                            {t.name}
+                          </span>
+                        </div>
+                      </div>
+                    ))}
+                </div>
+              )}
             </div>
           </CardContent>
           <CardFooter className="pt-8 flex flex-col space-y-4">
