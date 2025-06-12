@@ -10,23 +10,11 @@ import {
 } from "@/components/ui/card";
 import { ChevronRight, Calendar, Tag } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import {
-  getTasks,
-  toggleTask,
-  createTask,
-} from "@/components/axiosControllers/TaskController"; 
-import { TaskPriority, TaskStatus } from "@/types";
-
-type Task = {
-  id: number;
-  title: string;
-  completed: boolean;
-  tags: string[];
-  date: string | null;
-};
+import { taskService } from "@/services/taskService";
+import { TaskPriority, TaskStatus, type TaskDTO } from "@/types";
 
 type TodayTasksProps = {
-  tasks: Task[];
+  tasks: TaskDTO[];
   onToggleTask: (id: number) => void;
 };
 
@@ -36,13 +24,12 @@ const tagColors: Record<string, string> = {
 };
 
 const TodayTasks: React.FC<TodayTasksProps> = () => {
-  const [tasks, setTasks] = useState<Task[]>([]);
+  const [tasks, setTasks] = useState<TaskDTO[]>([]);
   const [loading, setLoading] = useState(true);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [priority, setPriority] = useState("");
   const [adding, setAdding] = useState(false);
-  
+  const [expandedTaskId, setExpandedTaskId] = useState<number | null>(null); // Nuevo estado
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -55,30 +42,41 @@ const TodayTasks: React.FC<TodayTasksProps> = () => {
       tags: [], // Debes reemplazar esto con los tags seleccionados
     };
     try {
-      setAdding(true)
-      const response = await createTask(taskDTO);
+      setAdding(true);
+      const response = await taskService.createTask(taskDTO);
       console.log(response);
       setTitle("");
       setDescription("");
     } catch (error) {
       console.error(error);
     } finally {
-      setAdding(false)
+      setAdding(false);
     }
   };
 
   useEffect(() => {
     const fetchTasks = async () => {
-      const tasksData = await getTasks();
+      const tasksData = await taskService.getAllTasks();
       setTasks(tasksData);
       setLoading(false);
     };
     fetchTasks();
   }, []);
 
-  const handleToggleTask = async (id: number) => {
-    const toggledTask = await toggleTask(id);
-    setTasks(tasks.map((task) => (task.id === id ? toggledTask : task)));
+  const handleToggleTask = async (id: number, task: TaskDTO) => {
+    const updatedTask = {
+      ...task,
+      status:
+        task.status === TaskStatus.COMPLETED
+          ? TaskStatus.IN_PROGRESS
+          : TaskStatus.COMPLETED,
+    };
+    const toggledTask = await taskService.updateTask(id, updatedTask);
+
+    setTasks(tasks.map((t) => (t.id === id ? toggledTask : t)));
+  };
+  const handleExpand = (id: number) => {
+    setExpandedTaskId(expandedTaskId === id ? null : id);
   };
 
   return (
@@ -103,7 +101,12 @@ const TodayTasks: React.FC<TodayTasksProps> = () => {
             onChange={(event) => setDescription(event.target.value)}
           />
 
-          <Button variant="default" className="w-full sm:w-auto" disabled={adding} type="submit">
+          <Button
+            variant="default"
+            className="w-full sm:w-auto"
+            disabled={adding}
+            type="submit"
+          >
             Añadir
           </Button>
         </form>
@@ -115,12 +118,16 @@ const TodayTasks: React.FC<TodayTasksProps> = () => {
           <Card key={task.id} className="group transition">
             <CardHeader className="flex flex-row items-center gap-2 px-4 py-2">
               <Checkbox
-                checked={task.completed}
-                onCheckedChange={() => handleToggleTask(task.id)}
+                onCheckedChange={() => {
+                  if (typeof task.id === "number") {
+                    handleToggleTask(task.id, task);
+                  }
+                }}
+                checked={task.status === TaskStatus.COMPLETED}
               />
               <CardTitle
                 className={
-                  task.completed
+                  task.status === TaskStatus.COMPLETED
                     ? "line-through text-muted-foreground flex-1"
                     : "flex-1"
                 }
@@ -131,9 +138,15 @@ const TodayTasks: React.FC<TodayTasksProps> = () => {
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="opacity-0 group-hover:opacity-100 transition"
+                  className="transition"
+                  onClick={() => handleExpand(task.id as number)}
+                  aria-label="Expandir detalles"
                 >
-                  <ChevronRight className="w-5 h-5" />
+                  <ChevronRight
+                    className={`w-5 h-5 transition-transform ${
+                      expandedTaskId === task.id ? "rotate-90" : ""
+                    }`}
+                  />
                 </Button>
               </CardAction>
             </CardHeader>
@@ -157,6 +170,20 @@ const TodayTasks: React.FC<TodayTasksProps> = () => {
                   </span>
                 ))}
               </div>
+              {expandedTaskId === task.id && (
+                <div className="mt-2 text-sm text-muted-foreground">
+                  <div>
+                    <span className="font-semibold">Descripción:</span>{" "}
+                    {task.description || (
+                      <span className="italic">Sin descripción</span>
+                    )}
+                  </div>
+                  <div>
+                    <span className="font-semibold">Prioridad:</span>{" "}
+                    {task.priority}
+                  </div>
+                </div>
+              )}
             </CardContent>
           </Card>
         ))

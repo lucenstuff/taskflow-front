@@ -67,9 +67,5 @@ const deleteTask = async (id: number) => {
   return response.data;
 };
 
-const toggleTask = async (id: number) => {
-  const response = await api.patch(`/api/v1/tasks/${id}`);
-  return response.data;
-};
 
-export { getTasks, getTaskById, createTask, updateTask, deleteTask, toggleTask };
+export { getTasks, getTaskById, createTask, updateTask, deleteTask };
