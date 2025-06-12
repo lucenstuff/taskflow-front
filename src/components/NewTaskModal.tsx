@@ -1,5 +1,12 @@
 import { useEffect, useState } from "react";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "./ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "./ui/card";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 import {
@@ -12,56 +19,92 @@ import {
 import type { TagDTO } from "@/types";
 import { tagService } from "@/services/tagService";
 import { toast } from "sonner";
+import { taskService } from "@/services/taskService";
 
 interface NewTaskModalProps {
   onClose: () => void;
-  onCreate: (tag: {id : number, title: string; description: string, priority: string, date : string, tags : string[]}) => void;
+  onTaskCreated: () => void;
 }
 
-const taskPriority = [
-    'HIGH',
-    'MEDIUM',
-    'LOW'
-]
+import { TaskPriority, TaskStatus } from "@/types/task";
 
-export default function NewTaskModal({ onClose, onCreate }: NewTaskModalProps) {
+const taskPriority: TaskPriority[] = [
+  TaskPriority.HIGH,
+  TaskPriority.MEDIUM,
+  TaskPriority.LOW,
+];
+
+export default function NewTaskModal({
+  onClose,
+  onTaskCreated,
+}: NewTaskModalProps) {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [priority, setPriority] = useState("");
-  const [tags, setTags] = useState("")
+  const [priority, setPriority] = useState<TaskPriority | "">("");
+  const [selectedTagId, setSelectedTagId] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
-  const [availableTags , setAvailableTags] = useState<TagDTO[]>([])
+  const [availableTags, setAvailableTags] = useState<TagDTO[]>([]);
+
+  const priorityLabels: Record<TaskPriority, string> = {
+    HIGH: "Alta",
+    MEDIUM: "Media",
+    LOW: "Baja",
+  };
 
   useEffect(() => {
-      tagService.getAll().then(setAvailableTags);
-    }, []);
+    tagService.getAll().then(setAvailableTags);
+  }, []);
+
+  const getUserTags = () => {
+    tagService
+      .getAll()
+      .then((tags) => {
+        setAvailableTags(tags);
+      })
+      .catch((error) => {
+        console.error("Error fetching tags:", error);
+        toast.error("Error al obtener las etiquetas.");
+      });
+  };
+
+  useEffect(() => {
+    getUserTags();
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (isLoading) return;
     setIsLoading(true);
-    const newTask = {
-        title: title,
-        description : description,
-        priority: priority,
-        complete: false,
-        date: new Date(),
-        tags: [tags]
-    }
+
     try {
-        console.log(newTask);
-        onCreate({id : 10, title : newTask.title, description : newTask.description, date: newTask.date.toDateString(), tags : newTask.tags, priority : newTask.priority})
-        onClose();
-    } catch {
-        toast.error("Error al añadir la tarea.")
-    }  finally {
-        setIsLoading(false)
+      const tagIds = selectedTagId ? [selectedTagId] : [];
+      await taskService.createTask({
+        title,
+        description,
+        priority: priority as TaskPriority,
+        due_date: new Date().toISOString(),
+        status: "IN_PROGRESS" as TaskStatus,
+        tags: availableTags.filter((tag) => tagIds.includes(tag.id!)), 
+      });
+
+      setTitle("");
+      setDescription("");
+      setPriority("");
+      setSelectedTagId(null);
+      onTaskCreated();
+      onClose();
+    } catch (error) {
+      console.error("Error creating task:", error);
+      toast.error("Error al crear la tarea.");
+    } finally {
+      setIsLoading(false);
     }
-  }
+  };
 
   return (
     <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
-      <Card className="w-[400px]">
+      <Card className="w-96">
         <CardHeader className="text-center">
           <CardTitle className="text-2xl font-bold">Nueva Tarea</CardTitle>
           <CardDescription>Agrega tarea.</CardDescription>
@@ -109,42 +152,51 @@ export default function NewTaskModal({ onClose, onCreate }: NewTaskModalProps) {
               >
                 Prioridad:
               </label>
-              <Select 
-                onValueChange={(e) => setPriority(e)}
+              <Select
+                onValueChange={(e) => setPriority(e as TaskPriority)}
                 required
-                >
+              >
                 <SelectTrigger className="w-full">
-                    <SelectValue placeholder="Selecciona la prioridad" />
+                  <SelectValue placeholder="Selecciona la prioridad" />
                 </SelectTrigger>
                 <SelectContent>
-                    {taskPriority.map((v, i) => {
-                        return(
-                            <SelectItem key={i} value={v}>{v}</SelectItem>
-                        );
-                    })}
+                  {taskPriority.map((v, i) => {
+                    return (
+                      <SelectItem key={i} value={v}>
+                        {priorityLabels[v]}
+                      </SelectItem>
+                    );
+                  })}
                 </SelectContent>
               </Select>
             </div>
             <div className="space-y-2">
               <label
-                htmlFor="priority"
+                htmlFor="tags"
                 className="text-sm font-medium leading-none"
               >
                 Etiquetas:
               </label>
-              <Select 
-                onValueChange={(e) => setTags(e)}
-                disabled={(availableTags.length <= 0)}>
+              <Select
+                onValueChange={(value) => setSelectedTagId(Number(value))}
+                disabled={availableTags.length <= 0}
+                value={selectedTagId ? String(selectedTagId) : ""}
+              >
                 <SelectTrigger className="w-full">
-                    <SelectValue placeholder={(availableTags.length > 0)? "Selecciona etiquetas disponibles" : "No hay etiquetas disponibles"}/>
+                  <SelectValue
+                    placeholder={
+                      availableTags.length > 0
+                        ? "Selecciona etiquetas disponibles"
+                        : "No hay etiquetas disponibles"
+                    }
+                  />
                 </SelectTrigger>
                 <SelectContent>
-                    {availableTags.map((t) => {
-                            return(
-                                <SelectItem key={t.id} value={t.name}>{t.name}</SelectItem>
-                            );
-                        })
-                    }
+                  {availableTags.map((t) => (
+                    <SelectItem key={t.id} value={String(t.id)}>
+                      {t.name}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
