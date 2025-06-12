@@ -5,7 +5,7 @@ import { TaskLayout } from "./layouts/TaskLayout";
 import Register from "./components/Register";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Tasks from "./components/Tasks";
-
+import Not_Found from "./errors/Not_Found";
 
 export function AppRoutes() {
   return (
@@ -23,6 +23,9 @@ export function AppRoutes() {
         <Route path="/" element={<Tasks />} />
       </Route>
       <Route path="/register" element={<Register />} />
+
+      
+      <Route path="*" element={<Not_Found />} />
     </Routes>
   );
 }
