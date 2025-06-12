@@ -1,13 +1,16 @@
 import { Link, useLocation } from "react-router-dom";
-import { X, LogOut, Menu } from "lucide-react";
+import { X, LogOut, Menu, Edit, MoreHorizontal, Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { tagService } from "@/services/tagService";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import type { TagDTO } from "@/types";
 import { authService } from "@/services/authService";
 import { useNavigate } from "react-router-dom";
 import NewTagModal from "./NewTagModal";
+import DeleteTagModal from "./DeleteTagModal";
+import EditTagModal from "./EditTagModal";
+import { toast } from "sonner";
 
 const tasks = [
   {
@@ -42,6 +45,12 @@ export function Sidebar({
 
   const [tags, setTags] = useState<TagDTO[]>([]);
   const [showNewTagModal, setShowNewTagModal] = useState(false);
+  const [tagToDelete, setTagToDelete] = useState<TagDTO | null>(null);
+  const [tagToEdit, setTagToEdit] = useState<TagDTO | null>(null);
+  const [isDeleting, setIsDeleting] = useState<number | null>(null);
+  const [openDropdownId, setOpenDropdownId] = useState<number | null>(null);
+  // Create separate refs for each dropdown
+  const dropdownRefs = useRef<Map<number, HTMLDivElement | null>>(new Map());
 
   useEffect(() => {
     tagService.getAll().then(setTags);
@@ -52,11 +61,95 @@ export function Sidebar({
     navigate("/login");
   };
 
-  const handleCreateTag = (tag: { name: string; color: string }) => {
-    setTags((prev) => [
-      ...prev,
-      { name: tag.name, color: tag.color } as TagDTO,
-    ]);
+  const handleCreateTag = (tag: TagDTO) => {
+    setTags((prev) => [...prev, tag]);
+  };
+
+  const handleEditTag = (updatedTag: TagDTO) => {
+    if (typeof updatedTag.id !== "number") {
+      console.error("Tag id is missing or not a number.");
+      toast.error("No se pudo actualizar la etiqueta: id inválido.");
+      return;
+    }
+
+    tagService
+      .updateTag(updatedTag.id, updatedTag)
+      .then(() => {
+        setTags((prev) =>
+          prev.map((tag) => (tag.id === updatedTag.id ? updatedTag : tag))
+        );
+        toast.success("Etiqueta actualizada exitosamente.");
+        setTagToEdit(null);
+      })
+      .catch((error) => {
+        console.error("Error updating tag:", error);
+        toast.error("Error al actualizar la etiqueta.");
+      });
+  };
+
+  const handleDeleteTag = (tag: TagDTO) => {
+    if (typeof tag.id !== "number") {
+      console.error("Tag id is missing or not a number.");
+      toast.error("No se pudo eliminar la etiqueta: id inválido.");
+      return;
+    }
+
+    setIsDeleting(tag.id);
+    tagService
+      .deleteTag(tag.id)
+      .then(() => {
+        setTags((prev: TagDTO[]) =>
+          prev.filter((t: TagDTO) => t.id !== tag.id)
+        );
+        toast.success("Etiqueta eliminada exitosamente.");
+      })
+      .catch((error: unknown) => {
+        console.error("Error deleting tag:", error);
+        toast.error("Error al eliminar la etiqueta.");
+      })
+      .finally(() => {
+        setIsDeleting(null);
+        setTagToDelete(null);
+      });
+  };
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (openDropdownId !== null) {
+        const currentRef = dropdownRefs.current.get(openDropdownId);
+        if (currentRef && !currentRef.contains(event.target as Node)) {
+          setOpenDropdownId(null);
+        }
+      }
+    }
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [openDropdownId]);
+
+  const toggleDropdown = (tagId: number | undefined, e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (tagId !== undefined) {
+      setOpenDropdownId(openDropdownId === tagId ? null : tagId);
+    }
+  };
+
+  // Separate function handlers for edit and delete that first close the dropdown
+  const handleEditClick = (tag: TagDTO, e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setOpenDropdownId(null);
+    setTagToEdit(tag);
+  };
+
+  const handleDeleteClick = (tag: TagDTO, e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setOpenDropdownId(null);
+    setTagToDelete(tag);
   };
 
   const SidebarContent = ({ onClose }: { onClose?: () => void }) => (
@@ -110,23 +203,65 @@ export function Sidebar({
         {tags.map((tag) => (
           <span
             key={tag.name}
-            className={cn(
-              "inline-flex items-center px-3 py-2 text-xs font-medium rounded-full mr-2 mb-2",
-              `bg-${tag.color}-500`
-            )}
+            className="inline-flex items-center px-2 py-1 text-xs font-medium rounded-sm mr-2 mb-2 relative hover:brightness-110 overflow-visible"
+            style={{ position: "relative" }}
           >
-            {tag.name}
+            <span
+              className="absolute inset-0 z-0 rounded-sm"
+              style={{
+                backgroundColor: tag.color,
+                opacity: 0.5,
+              }}
+            />
+            <div className="flex items-center justify-center z-10 relative">
+              {tag.name}
+              <div
+                className="relative"
+                ref={(el) => {
+                  if (tag.id !== undefined) {
+                    dropdownRefs.current.set(tag.id, el);
+                  }
+                }}
+              >
+                <button
+                  className="ml-1 p-1 rounded-full hover:bg-black/10 focus:outline-none"
+                  onClick={(e) => toggleDropdown(tag.id, e)}
+                >
+                  <MoreHorizontal className="w-3 h-3" />
+                </button>
+
+                {openDropdownId === tag.id && (
+                  <div className="absolute left-full ml-1 top-0 w-32 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-50">
+                    <div className="py-1">
+                      <button
+                        className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                        onClick={(e) => handleEditClick(tag, e)}
+                      >
+                        <Edit className="w-4 h-4 mr-2" />
+                        Editar
+                      </button>
+                      <button
+                        className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                        onClick={(e) => handleDeleteClick(tag, e)}
+                      >
+                        <Trash2 className="w-4 h-4 mr-2" />
+                        Eliminar
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
           </span>
         ))}
-        <span className="inline-flex items-center px-3 py-2 text-xs font-medium rounded-full mr-2 mb-2 bg-neutral-100 border">
-          <button
-            type="button"
-            className="text-muted-foreground hover:text-primary"
-            onClick={() => setShowNewTagModal(true)}
-          >
-            + Añadir Etiqueta
-          </button>
-        </span>
+        <button
+          type="button"
+          className="inline-flex items-center px-2 py-2 text-xs font-medium rounded-md mr-2 mb-2 bg-neutral-100 border text-muted-foreground hover:text-primary"
+          onClick={() => setShowNewTagModal(true)}
+          aria-label="Añadir Etiqueta"
+        >
+          + Añadir Etiqueta
+        </button>
       </div>
 
       <div className="flex-1" />
@@ -180,6 +315,23 @@ export function Sidebar({
         <NewTagModal
           onClose={() => setShowNewTagModal(false)}
           onCreate={handleCreateTag}
+        />
+      )}
+
+      {tagToDelete && (
+        <DeleteTagModal
+          tag={tagToDelete}
+          onClose={() => setTagToDelete(null)}
+          onDelete={handleDeleteTag}
+          isLoading={tagToDelete?.id ? isDeleting === tagToDelete.id : false}
+        />
+      )}
+
+      {tagToEdit && (
+        <EditTagModal
+          tag={tagToEdit}
+          onClose={() => setTagToEdit(null)}
+          onUpdate={handleEditTag}
         />
       )}
     </>
