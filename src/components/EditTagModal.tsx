@@ -77,7 +77,7 @@ const EditTagModal = ({ tag, onClose, onUpdate }: EditTagModalProps) => {
                 id="name"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                placeholder="Nombre de la etiqueta"
+                placeholder="Ej: 🏠 Hogar"
                 required
               />
             </div>
