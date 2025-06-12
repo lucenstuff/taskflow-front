@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 import type { TagDTO } from "@/types";
 import { authService } from "@/services/authService";
 import { useNavigate } from "react-router-dom";
+import NewTagModal from "./NewTagModal";
 
 const tasks = [
   {
@@ -20,13 +21,6 @@ const tasks = [
     href: "/today",
   },
 ];
-
-// const tags = [
-//   { name: "🏠 Hogar", color: "bg-cyan-100 text-cyan-900" },
-//   { name: "🎉 Cumpleaños", color: "bg-red-100 text-red-900" },
-//   { name: "📚 Estudio", color: "bg-yellow-100 text-yellow-900" },
-//   { name: "💼 Trabajo", color: "bg-blue-100 text-blue-900" },
-// ];
 
 interface SidebarProps {
   isMobileMenuOpen: boolean;
@@ -47,6 +41,7 @@ export function Sidebar({
   const navigate = useNavigate();
 
   const [tags, setTags] = useState<TagDTO[]>([]);
+  const [showNewTagModal, setShowNewTagModal] = useState(false);
 
   useEffect(() => {
     tagService.getAll().then(setTags);
@@ -55,6 +50,13 @@ export function Sidebar({
   const handleLogout = () => {
     authService.logout();
     navigate("/login");
+  };
+
+  const handleCreateTag = (tag: { name: string; color: string }) => {
+    setTags((prev) => [
+      ...prev,
+      { name: tag.name, color: tag.color } as TagDTO,
+    ]);
   };
 
   const SidebarContent = ({ onClose }: { onClose?: () => void }) => (
@@ -110,16 +112,20 @@ export function Sidebar({
             key={tag.name}
             className={cn(
               "inline-flex items-center px-3 py-2 text-xs font-medium rounded-full mr-2 mb-2",
-              `bg-${tag.color}-100`
+              `bg-${tag.color}-500`
             )}
           >
             {tag.name}
           </span>
         ))}
         <span className="inline-flex items-center px-3 py-2 text-xs font-medium rounded-full mr-2 mb-2 bg-neutral-100 border">
-          <Link to="/tags" className="text-muted-foreground hover:text-primary">
+          <button
+            type="button"
+            className="text-muted-foreground hover:text-primary"
+            onClick={() => setShowNewTagModal(true)}
+          >
             + Añadir Etiqueta
-          </Link>
+          </button>
         </span>
       </div>
 
@@ -169,6 +175,13 @@ export function Sidebar({
       <div className="inset-y-0 left-0 z-30 hidden md:flex flex-col w-64 bg-background border-r border-border">
         <SidebarContent />
       </div>
+
+      {showNewTagModal && (
+        <NewTagModal
+          onClose={() => setShowNewTagModal(false)}
+          onCreate={handleCreateTag}
+        />
+      )}
     </>
   );
 }
