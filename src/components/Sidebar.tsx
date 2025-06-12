@@ -1,5 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
-import { X, LogOut, Menu, Edit, MoreHorizontal, Trash2 } from "lucide-react";
+import { X, LogOut, Menu, Edit, Trash2, MoreVertical } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { tagService } from "@/services/tagService";
@@ -199,61 +199,59 @@ export function Sidebar({
       <div className="px-4 pt-2 pb-1 font-semibold text-primary tracking-widest">
         Tus Etiquetas🏷️:
       </div>
+
       <div className="px-4 py-2 flex flex-wrap pb-4 border-b">
         {tags.map((tag) => (
-          <span
-            key={tag.name}
-            className="inline-flex items-center px-2 py-1 text-xs font-medium rounded-sm mr-2 mb-2 relative hover:brightness-110 overflow-visible"
-            style={{ position: "relative" }}
-          >
-            <span
-              className="absolute inset-0 z-0 rounded-sm"
-              style={{
-                backgroundColor: tag.color,
-                opacity: 0.5,
-              }}
-            />
-            <div className="flex items-center justify-center z-10 relative">
-              {tag.name}
-              <div
-                className="relative"
-                ref={(el) => {
-                  if (tag.id !== undefined) {
-                    dropdownRefs.current.set(tag.id, el);
-                  }
-                }}
-              >
-                <button
-                  className="ml-1 p-1 rounded-full hover:bg-black/10 focus:outline-none"
-                  onClick={(e) => toggleDropdown(tag.id, e)}
-                >
-                  <MoreHorizontal className="w-3 h-3" />
-                </button>
+          <div key={tag.name} className="relative mr-2 mb-2">
+            <div className="relative inline-flex items-center text-xs font-medium rounded-md">
+              <span
+                className="absolute inset-0 rounded-sm"
+                style={{ backgroundColor: tag.color, opacity: 0.5 }}
+              />
 
-                {openDropdownId === tag.id && (
-                  <div className="absolute left-full ml-1 top-0 w-32 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-50">
-                    <div className="py-1">
-                      <button
-                        className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                        onClick={(e) => handleEditClick(tag, e)}
-                      >
-                        <Edit className="w-4 h-4 mr-2" />
-                        Editar
-                      </button>
-                      <button
-                        className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                        onClick={(e) => handleDeleteClick(tag, e)}
-                      >
-                        <Trash2 className="w-4 h-4 mr-2" />
-                        Eliminar
-                      </button>
+              <span className="relative z-10 flex items-center px-2 py-2 gap-1 rounded-sm">
+                {tag.name}
+                <div
+                  ref={(el) => {
+                    if (tag.id !== undefined) {
+                      dropdownRefs.current.set(tag.id, el);
+                    }
+                  }}
+                  className="relative"
+                >
+                  <button
+                    className="ml-1 p-0.5 rounded hover:bg-black/10 relative z-10"
+                    onClick={(e) => toggleDropdown(tag.id, e)}
+                  >
+                    <MoreVertical className="w-3 h-3" />
+                  </button>
+
+                  {openDropdownId === tag.id && (
+                    <div className="absolute left-1 mt-1 w-32 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-50">
+                      <div className="py-1">
+                        <button
+                          className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                          onClick={(e) => handleEditClick(tag, e)}
+                        >
+                          <Edit className="w-4 h-4 mr-2" />
+                          Editar
+                        </button>
+                        <button
+                          className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                          onClick={(e) => handleDeleteClick(tag, e)}
+                        >
+                          <Trash2 className="w-4 h-4 mr-2" />
+                          Eliminar
+                        </button>
+                      </div>
                     </div>
-                  </div>
-                )}
-              </div>
+                  )}
+                </div>
+              </span>
             </div>
-          </span>
+          </div>
         ))}
+
         <button
           type="button"
           className="inline-flex items-center px-2 py-2 text-xs font-medium rounded-md mr-2 mb-2 bg-neutral-100 border text-muted-foreground hover:text-primary"
