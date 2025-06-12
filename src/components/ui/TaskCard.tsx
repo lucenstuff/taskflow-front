@@ -7,7 +7,7 @@ import {
   CardContent,
   CardAction,
 } from "@/components/ui/card";
-import { ChevronRight, Tag } from "lucide-react";
+import { ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { TaskStatus, type TaskDTO } from "@/types";
 
@@ -25,7 +25,6 @@ const TaskCard: React.FC<TaskCardProps> = ({
   expanded,
   onToggleTask,
   onExpand,
-  tagColors,
   priorityLabels,
 }) => (
   <Card key={task.id} className="group transition rounded-sm">
@@ -64,17 +63,21 @@ const TaskCard: React.FC<TaskCardProps> = ({
       </CardAction>
     </CardHeader>
     <CardContent className="pt-0 pb-2">
-      {task.tags?.map((tag) => (
-        <span
-          key={typeof tag === "string" ? tag : tag.name}
-          className={`flex items-center gap-1 px-2 py-0.5 rounded ${
-            tagColors[typeof tag === "string" ? tag : tag.name] || "bg-muted"
-          }`}
-        >
-          <Tag className="w-3 h-3" />
-          {typeof tag === "string" ? tag : tag.name}
-        </span>
-      ))}
+      <div className="flex flex-row flex-wrap">
+        {task.tags?.map((t) => (
+          <div key={t.name} className="relative mr-2 mb-2">
+            <div className="relative inline-flex items-center text-xs font-medium rounded-md">
+              <span
+                className="absolute inset-0 rounded-sm"
+                style={{ backgroundColor: t.color, opacity: 0.5 }}
+              />
+              <span className="relative z-10 flex items-center px-2 py-2 gap-1 rounded-sm">
+                {t.name}
+              </span>
+            </div>
+          </div>
+        ))}
+      </div>
       {expanded && (
         <div className="mt-2 text-sm text-muted-foreground">
           <div>
