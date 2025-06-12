@@ -1,10 +1,8 @@
-import type { Task } from './task';
-
 export interface TagDTO {
   id?: number;
   name: string;
   color?: string;
-  task_id?: number;
+  task_ids?: number[];
 }
 
 export interface Tag {
@@ -13,5 +11,5 @@ export interface Tag {
   color?: string;
   createdAt: string;
   updatedAt: string;
-  tasks: Task[];
-} 
+  task_ids: number[];
+}
