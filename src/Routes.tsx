@@ -6,7 +6,7 @@ import Register from "./components/Register";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Tasks from "./components/Tasks";
 import TodayTasks from "./components/TodayTasks";
-
+import Not_Found from "./errors/Not_Found";
 
 export function AppRoutes() {
   return (
@@ -25,6 +25,7 @@ export function AppRoutes() {
       </Route>
       <Route path="/register" element={<Register />} />
       <Route path="/today" element={<TodayTasks tasks={[]} onToggleTask={() => {}} />} />
+      <Route path="*" element={<Not_Found />} />
     </Routes>
   );
 }

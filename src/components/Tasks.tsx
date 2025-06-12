@@ -59,7 +59,7 @@ export default function TasksPage() {
     <div className="w-full space-y-4">
       <div className="flex items-center gap-2 justify-start mb-4">
         <h1 className="text-2xl sm:text-3xl font-bold">Tareas</h1>
-        <span className="text-xl sm:text-2xl bg-muted rounded px-3 py-1 font-semibold">
+        <span className="text-lg sm:text-xl bg-muted rounded px-3 py-1 font-semibold">
           {tasks.length}
         </span>
       </div>
