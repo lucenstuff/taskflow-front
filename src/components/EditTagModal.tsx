@@ -1,46 +1,46 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogDescription,
   DialogFooter,
+  DialogDescription,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { tagService } from "@/services/tagService";
-import { toast } from "sonner";
-import { Label } from "@/components/ui/label";
 import type { TagDTO } from "@/types";
+import { Label } from "@/components/ui/label";
 
-interface NewTagModalProps {
+interface EditTagModalProps {
+  tag: TagDTO;
   onClose: () => void;
-  onCreate: (tag: TagDTO) => void;
+  onUpdate: (tag: TagDTO) => void;
 }
 
-const NewTagModal = ({ onClose, onCreate }: NewTagModalProps) => {
-  const [name, setName] = useState("");
-  const [color, setColor] = useState("blue");
+const EditTagModal = ({ tag, onClose, onUpdate }: EditTagModalProps) => {
+  const [name, setName] = useState(tag.name);
+  const [color, setColor] = useState(tag.color || "blue");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  useEffect(() => {
+    setName(tag.name);
+    setColor(tag.color || "blue");
+  }, [tag]);
+
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
 
-    try {
-      const newTag = await tagService.createTag({ name, color });
-      toast.success("Etiqueta creada exitosamente.");
-      onCreate(newTag);
-      onClose();
-    } catch (error) {
-      console.error("Error creating tag:", error);
-      toast.error("Error al crear la etiqueta.");
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
+    const updatedTag = {
+      ...tag,
+      name,
+      color,
+    };
 
+    onUpdate(updatedTag);
+    setIsSubmitting(false);
+  };
 
   const colorOptions = [
     "gray",
@@ -63,9 +63,9 @@ const NewTagModal = ({ onClose, onCreate }: NewTagModalProps) => {
     <Dialog open={true} onOpenChange={onClose}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Nueva Etiqueta</DialogTitle>
+          <DialogTitle>Editar Etiqueta</DialogTitle>
           <DialogDescription>
-            Crea una nueva etiqueta para organizar tus tareas.
+            Actualiza el nombre o el color de tu etiqueta.
           </DialogDescription>
         </DialogHeader>
 
@@ -81,7 +81,6 @@ const NewTagModal = ({ onClose, onCreate }: NewTagModalProps) => {
                 required
               />
             </div>
-
             <div className="space-y-2">
               <Label htmlFor="name">Color</Label>
             </div>
@@ -113,8 +112,8 @@ const NewTagModal = ({ onClose, onCreate }: NewTagModalProps) => {
             >
               Cancelar
             </Button>
-            <Button type="submit" disabled={isSubmitting || !name.trim()}>
-              {isSubmitting ? "Creando..." : "Crear"}
+            <Button type="submit" disabled={isSubmitting}>
+              {isSubmitting ? "Guardando..." : "Guardar Cambios"}
             </Button>
           </DialogFooter>
         </form>
@@ -123,4 +122,4 @@ const NewTagModal = ({ onClose, onCreate }: NewTagModalProps) => {
   );
 };
 
-export default NewTagModal;
+export default EditTagModal;
