@@ -27,7 +27,7 @@ function Login() {
 
     try {
       await login({ email, password });
-      toast.success("Inicio de sesión exitoso. Bienvenido a Task Flow 🚀!");
+      toast.success("Bienvenido a Task Flow 🚀!");
       setEmail("");
       setPassword("");
       navigate("/");
