@@ -8,7 +8,6 @@ import {
   CardContent,
   CardAction,
 } from "@/components/ui/card";
-
 import { ChevronRight, Calendar, Tag } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -41,29 +40,30 @@ const TodayTasks: React.FC<TodayTasksProps> = () => {
   const [loading, setLoading] = useState(true);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [date, setDate] = useState("");
-
+  const [priority, setPriority] = useState("");
+  const [adding, setAdding] = useState(false);
   
 
   const handleSubmit = async (event) => {
     event.preventDefault();
     const taskDTO = {
-      id:0,
       title,
       description,
       status: TaskStatus.IN_PROGRESS,
-      priority: TaskPriority.LOW,
-      updated_at: new Date(date), 
-      finished_at: new Date(date),
-      created_at: new Date(date),
-      userId: 1, // Debes reemplazar esto con el ID del usuario autenticado
+      priority: TaskPriority.MEDIUM,
+      // Debes reemplazar esto con el ID del usuario autenticado
       tags: [], // Debes reemplazar esto con los tags seleccionados
     };
     try {
+      setAdding(true)
       const response = await createTask(taskDTO);
       console.log(response);
+      setTitle("");
+      setDescription("");
     } catch (error) {
       console.error(error);
+    } finally {
+      setAdding(false)
     }
   };
 
@@ -102,15 +102,8 @@ const TodayTasks: React.FC<TodayTasksProps> = () => {
             value={description}
             onChange={(event) => setDescription(event.target.value)}
           />
-          <Input
-            type="date"
-            placeholder="Añadir Date"
-            className="flex-1"
-            value={date}
-            onChange={(event) => setDate(event.target.value)}
-          />
 
-          <Button variant="default" className="w-full sm:w-auto" type="submit">
+          <Button variant="default" className="w-full sm:w-auto" disabled={adding} type="submit">
             Añadir
           </Button>
         </form>

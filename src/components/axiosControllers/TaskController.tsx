@@ -1,19 +1,32 @@
 import { authService } from '@/services/authService';
-import axios from 'axios';
-
+import axios from 'axios'; 
 
 interface TaskDTO {
-  id: number;
+  id?: number;
   title: string;
   description: string;
   status: string;
   priority: string;
-  created_at: Date;
-  updated_at: Date;
-  finished_at: Date;
-  userId: number;
+  created_at?: Date;
+  updated_at?: Date;
+  finished_at?: Date;
+  userId?: number;
   tags: TagDTO[];
 }
+
+/* interfaz de task.ts
+export interface TaskDTO {
+  id?: number;
+  title: string;
+  description: string;
+  status: TaskStatus;
+  priority: TaskPriority;
+  created_at?: string;
+  updated_at?: string;
+  finished_at?: string;
+  userId?: number;
+  tags?: TagDTO[];
+}*/
 
 interface TagDTO {
   id: number;
