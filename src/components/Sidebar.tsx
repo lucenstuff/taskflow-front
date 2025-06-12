@@ -14,12 +14,12 @@ import { toast } from "sonner";
 
 const tasks = [
   {
-    name: "Próximas Tareas",
+    name: "Próximas Tareas ⏰",
     count: 12,
     href: "/upcoming",
   },
   {
-    name: "Tareas de Hoy",
+    name: "Tareas de Hoy 📅",
     count: 5,
     href: "/today",
   },
@@ -154,7 +154,7 @@ export function Sidebar({
 
   const SidebarContent = ({ onClose }: { onClose?: () => void }) => (
     <div className="flex flex-col h-full">
-      <div className="flex items-center justify-between p-4 border-b border-border">
+      <div className="flex items-center justify-between py-2 px-4 border-b border-border">
         <span className="font-bold text-lg whitespace-nowrap text-primary">
           {brandName}
         </span>
@@ -170,8 +170,8 @@ export function Sidebar({
         )}
       </div>
 
-      <div className="px-4 pt-2 pb-1 font-semibold text-muted-foreground tracking-widest">
-        Tareas:
+      <div className="px-4 pt-2 pb-1 font-semibold text-primary tracking-widest">
+        Tareas📚:
       </div>
       <div className="pb-4 border-b">
         {tasks.map((task) => (
@@ -196,8 +196,8 @@ export function Sidebar({
         ))}
       </div>
 
-      <div className="px-4 pt-2 pb-1 font-semibold text-muted-foreground tracking-widest">
-        Tus Etiquetas:
+      <div className="px-4 pt-2 pb-1 font-semibold text-primary tracking-widest">
+        Tus Etiquetas🏷️:
       </div>
       <div className="px-4 py-2 flex flex-wrap pb-4 border-b">
         {tags.map((tag) => (
@@ -281,7 +281,7 @@ export function Sidebar({
 
   return (
     <>
-      <div className="flex items-center justify-center p-4 border-b border-border md:hidden">
+      <div className="flex items-center justify-center py-2 px-4 border-b border-border md:hidden">
         <button onClick={onMobileMenuToggle} aria-label="Abrir menú">
           <Menu className="w-6 h-6 text-primary" />
         </button>

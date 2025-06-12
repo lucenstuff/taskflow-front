@@ -72,7 +72,7 @@ function Register() {
     <div className="flex items-center justify-center min-h-screen bg-background shadow-lg">
       <Card className="w-[400px]">
         <CardHeader className="text-center">
-          <CardTitle className="text-2xl font-bold">Task Flow</CardTitle>
+          <CardTitle className="text-2xl font-bold">Task Flow 🚀</CardTitle>
           <CardDescription>Registrarse</CardDescription>
         </CardHeader>
         <form onSubmit={handleSubmit}>

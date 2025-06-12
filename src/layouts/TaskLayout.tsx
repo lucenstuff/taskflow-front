@@ -15,7 +15,7 @@ export const TaskLayout = (): ReactNode => {
         isMobileMenuOpen={isMobileMenuOpen}
         onMobileMenuClose={handleMobileMenuClose}
         onMobileMenuToggle={handleMobileMenuToggle}
-        brandName="Task Flow"
+        brandName="Task Flow 🚀"
       />
       <main className="flex-1 overflow-y-auto bg-background p-4">
         <Outlet />
