@@ -5,6 +5,7 @@ import { TaskLayout } from "./layouts/TaskLayout";
 import Register from "./components/Register";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Tasks from "./components/Tasks";
+import TodayTasks from "./components/TodayTasks";
 
 
 export function AppRoutes() {
@@ -20,9 +21,10 @@ export function AppRoutes() {
           </ProtectedRoute>
         }
       >
-        <Route path="/" element={<Tasks />} />
+        <Route path="/" element={<Tasks />} /> 
       </Route>
       <Route path="/register" element={<Register />} />
+      <Route path="/today" element={<TodayTasks tasks={[]} onToggleTask={() => {}} />} />
     </Routes>
   );
 }
