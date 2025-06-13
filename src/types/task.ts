@@ -21,6 +21,7 @@ export interface TaskDTO {
   description: string;
   status: TaskStatus;
   priority: TaskPriority;
+  due_date?: string;
   created_at?: string;
   updated_at?: string;
   finished_at?: string;

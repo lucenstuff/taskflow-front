@@ -36,6 +36,12 @@ const api: AxiosInstance = axios.create({
 
 api.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
+    if (
+      config.url?.includes("/auth/login") ||
+      config.url?.includes("/auth/register")
+    ) {
+      return config;
+    }
     const token = authService.getToken();
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;

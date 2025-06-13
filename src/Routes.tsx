@@ -1,18 +1,31 @@
 import { Routes, Route } from "react-router-dom";
 import AuthLayout from "./layouts/AuthLayout";
 import Login from "./components/Login";
-import {TaskLayout} from "./layouts/TaskLayout";
-import GroupTaskUpcoming from "./components/GroupTaskUpcoming";
-import TaskListView from "./components/TaskListView";
+import { TaskLayout } from "./layouts/TaskLayout";
+import Register from "./components/Register";
+import ProtectedRoute from "./components/ProtectedRoute";
+import Tasks from "./components/Tasks";
+import TodayTasks from "./components/TodayTasks";
+import Not_Found from "./errors/Not_Found";
 
 export function AppRoutes() {
   return (
     <Routes>
       <Route element={<AuthLayout />}>
-        <Route path="/login" element={<Login />}/>
+        <Route path="/login" element={<Login />} />
       </Route>
-      <Route path="/"  element={<TaskLayout children={<GroupTaskUpcoming />} />}></Route>
-      <Route path="/today"  element={<TaskLayout children={<TaskListView />} />}></Route>
+      <Route
+        element={
+          <ProtectedRoute>
+            <TaskLayout />
+          </ProtectedRoute>
+        }
+      >
+        <Route path="/" element={<Tasks />} /> 
+      </Route>
+      <Route path="/register" element={<Register />} />
+      <Route path="/today" element={<TodayTasks tasks={[]} onToggleTask={() => {}} />} />
+      <Route path="*" element={<Not_Found />} />
     </Routes>
   );
 }

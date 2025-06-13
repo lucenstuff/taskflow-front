@@ -1,7 +1,7 @@
-import api from './apiConnection';
-import type { Tag, TagDTO } from '@/types';
+import api from "./apiConnection";
+import type { Tag, TagDTO } from "@/types";
 
-const BASE_PATH = '/api/v1/tags';
+const BASE_PATH = "/api/v1/tags";
 
 export const tagService = {
   getTagById: async (id: number): Promise<Tag> => {
@@ -21,5 +21,10 @@ export const tagService = {
 
   deleteTag: async (id: number): Promise<void> => {
     await api.delete(`${BASE_PATH}/${id}`);
-  }
-}; 
+  },
+
+  getAll: async (): Promise<TagDTO[]> => {
+    const response = await api.get<TagDTO[]>(BASE_PATH);
+    return response.data;
+  },
+};
