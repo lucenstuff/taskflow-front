@@ -1,141 +1,116 @@
-import React from "react";
-import { useState } from "react";
+import React, { useState } from "react";
 import { Checkbox } from "@/components/ui/checkbox";
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardContent,
-  CardAction,
-} from "@/components/ui/card";
-import { Edit, MoreVertical, Trash2 } from "lucide-react";
+import { Card, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Edit, Trash2 } from "lucide-react";
 import { TaskStatus, type TaskDTO } from "@/types";
+import DeleteTaskModal from "@/components/DeleteTaskModal";
 
 type TaskCardProps = {
   task: TaskDTO;
-  expanded: boolean;
   onToggleTask: (id: number) => void;
-  onExpand: (id: number) => void;
+  onEdit: (task: TaskDTO) => void;
+  onDelete: (task: TaskDTO) => void;
   tagColors: Record<string, string>;
   priorityLabels: Record<string, string>;
 };
 
 const TaskCard: React.FC<TaskCardProps> = ({
   task,
-  expanded,
   onToggleTask,
+  onEdit,
+  onDelete,
+  tagColors,
   priorityLabels,
 }) => {
-  const [openDropdownId, setOpenDropdownId] = useState<number | null>(null);
+  const isCompleted = task.status === TaskStatus.COMPLETED;
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
-  function toggleDropdown(id: number, e: React.MouseEvent) {
-    e.stopPropagation();
-    if (openDropdownId === id) {
-      setOpenDropdownId(null);
-    } else {
-      setOpenDropdownId(id);
-    }
-  }
-
-  function handleEditClick(task: TaskDTO, e: React.MouseEvent) {
-    e.stopPropagation();
-
-    // Logic to handle edit action
-  }
-
-  function handleDeleteClick(task: TaskDTO, e: React.MouseEvent) {
-    e.stopPropagation();
-    // Logic to handle delete action
-  }
+  const handleDelete = async (taskToDelete: TaskDTO) => {
+    setIsDeleting(true);
+    await onDelete(taskToDelete);
+    setIsDeleting(false);
+    setShowDeleteModal(false);
+  };
 
   return (
-    <Card key={task.id} className="group transition rounded-sm">
-      <CardHeader className="flex flex-row items-center gap-2 px-4 py-2">
-        <Checkbox
-          onCheckedChange={() => {
-            if (typeof task.id === "number") {
-              onToggleTask(task.id);
-            }
-          }}
-          checked={task.status === TaskStatus.COMPLETED}
-        />
-        <CardTitle
-          className={
-            task.status === TaskStatus.COMPLETED
-              ? "line-through text-muted-foreground flex-1"
-              : "flex-1"
-          }
-        >
-          {task.title}
-        </CardTitle>
-        <CardAction>
-          <button
-            className="ml-1 p-0.5 rounded hover:bg-black/10 relative z-10"
-            onClick={(e) => {
-              if (typeof task.id === "number") {
-                toggleDropdown(task.id, e);
+    <>
+      <Card
+        className={`rounded-xl border p-4 ${isCompleted ? "opacity-70" : ""}`}
+      >
+        <div className="flex items-start justify-between">
+          <div className="flex items-center gap-3">
+            <Checkbox
+              checked={isCompleted}
+              onCheckedChange={() =>
+                task.id !== undefined && onToggleTask(task.id)
               }
-            }}
-          >
-            <MoreVertical className="w-3 h-3" />
-          </button>
-
-          <div className="relative">
-            {openDropdownId === task.id && (
-              <div className="absolute -top-3 right-0 mt-2 w-32 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-50">
-                <div className="py-1">
-                  <button
-                    className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                    onClick={(e) => handleEditClick(task, e)}
-                  >
-                    <Edit className="w-4 h-4 mr-2" />
-                    Editar
-                  </button>
-                  <button
-                    className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                    onClick={(e) => handleDeleteClick(task, e)}
-                  >
-                    <Trash2 className="w-4 h-4 mr-2" />
-                    Eliminar
-                  </button>
-                </div>
-              </div>
-            )}
+            />
+            <CardTitle
+              className={`text-base font-semibold ${
+                isCompleted ? "line-through text-muted-foreground" : ""
+              }`}
+            >
+              {task.title}
+            </CardTitle>
           </div>
-        </CardAction>
-      </CardHeader>
-      <CardContent className="pt-0 pb-2">
-        <div className="flex flex-row flex-wrap">
-          {task.tags?.map((t) => (
-            <div key={t.name} className="relative mr-2 mb-2">
-              <div className="relative inline-flex items-center text-xs font-medium rounded-md">
-                <span
-                  className="absolute inset-0 rounded-sm"
-                  style={{ backgroundColor: t.color, opacity: 0.5 }}
-                />
-                <span className="relative z-10 flex items-center px-2 py-2 gap-1 rounded-sm">
-                  {t.name}
-                </span>
-              </div>
-            </div>
-          ))}
+
+          <div className="flex gap-2">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8"
+              onClick={() => onEdit(task)}
+            >
+              <Edit className="w-4 h-4" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8"
+              onClick={() => setShowDeleteModal(true)}
+            >
+              <Trash2 className="w-4 h-4 text-red-500" />
+            </Button>
+          </div>
         </div>
-        {expanded && (
-          <div className="mt-2 text-sm text-muted-foreground">
-            <div>
-              <span className="font-semibold">Descripción:</span>{" "}
-              {task.description || (
-                <span className="italic">Sin descripción</span>
-              )}
-            </div>
-            <div>
-              <span className="font-semibold">Prioridad:</span>{" "}
-              {priorityLabels[task.priority] || task.priority}
-            </div>
+
+        <div className="text-sm text-muted-foreground">
+          <span className="font-medium text-foreground">Descripción:</span>{" "}
+          {task.description || <span className="italic">Sin descripción</span>}
+        </div>
+
+        <div className="text-sm text-muted-foreground">
+          <span className="font-medium text-foreground">Prioridad:</span>{" "}
+          {priorityLabels[task.priority] || task.priority}
+        </div>
+
+        {Array.isArray(task.tags) && task.tags.length > 0 && (
+          <div className="flex flex-wrap gap-2 pt-2">
+            {task.tags.map((tag) => (
+              <span
+                key={tag.name}
+                className="text-xs px-2 py-1 rounded-sm text-white"
+                style={{
+                  backgroundColor: tag.color || tagColors[tag.name] || "#666",
+                }}
+              >
+                {tag.name}
+              </span>
+            ))}
           </div>
         )}
-      </CardContent>
-    </Card>
+      </Card>
+      {showDeleteModal && (
+        <DeleteTaskModal
+          task={task}
+          onClose={() => setShowDeleteModal(false)}
+          onDelete={handleDelete}
+          isLoading={isDeleting}
+        />
+      )}
+    </>
   );
 };
 

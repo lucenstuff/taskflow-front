@@ -45,6 +45,10 @@ export default function TasksPage() {
     }
   };
 
+  const handleDeleteTask = (id: number) => {
+    setTasks((prev) => prev.filter((task) => task.id !== id));
+  };
+
   return (
     <>
       <Card className="w-full mb-6 rounded-sm">
@@ -55,10 +59,17 @@ export default function TasksPage() {
               {tasks.length}
             </span>
           </div>
-          <Button onClick={() => setShowNewTaskModal(true)}> + Nueva Tarea</Button>
+          <Button onClick={() => setShowNewTaskModal(true)}>
+            {" "}
+            + Nueva Tarea
+          </Button>
         </CardContent>
       </Card>
-      <TodayTasks tasks={tasks} onToggleTask={handleToggleTask} />
+      <TodayTasks
+        tasks={tasks}
+        onToggleTask={handleToggleTask}
+        onDeleteTask={handleDeleteTask}
+      />
       {showNewTaskModal && (
         <NewTaskModal
           onClose={() => setShowNewTaskModal(false)}

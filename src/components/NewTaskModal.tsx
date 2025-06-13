@@ -43,6 +43,7 @@ export default function NewTaskModal({
   const [priority, setPriority] = useState<TaskPriority | "">("");
   const [selectedTagIds, setSelectedTagIds] = useState<number[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [tagSelectOpen, setTagSelectOpen] = useState(false);
 
   const [availableTags, setAvailableTags] = useState<TagDTO[]>([]);
 
@@ -179,15 +180,20 @@ export default function NewTaskModal({
               </label>
               <div>
                 <Select
-                  open={undefined}
-                  onOpenChange={undefined}
+                  open={tagSelectOpen}
+                  onOpenChange={setTagSelectOpen}
                   disabled={availableTags.length <= 0}
                 >
                   <SelectTrigger className="w-full">
                     <SelectValue
                       placeholder={
                         availableTags.length > 0
-                          ? "Selecciona etiquetas disponibles"
+                          ? selectedTagIds.length > 0
+                            ? availableTags
+                                .filter((t) => selectedTagIds.includes(t.id!))
+                                .map((t) => t.name)
+                                .join(", ")
+                            : "Selecciona etiquetas disponibles"
                           : "No hay etiquetas disponibles"
                       }
                     />
@@ -203,6 +209,7 @@ export default function NewTaskModal({
                               ? prev.filter((id) => id !== t.id)
                               : [...prev, t.id!]
                           );
+                          setTagSelectOpen(false);
                         }}
                       >
                         <input
