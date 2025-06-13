@@ -8,9 +8,14 @@ import { TaskStatus } from "@/types";
 import { Button } from "./ui/button";
 import { Card, CardContent } from "./ui/card";
 
+import EditTaskModal from "./EditTaskModal";
+
 export default function TasksPage() {
   const [tasks, setTasks] = useState<TaskDTO[]>([]);
   const [showNewTaskModal, setShowNewTaskModal] = useState(false);
+
+  const [showEditTaskModal, setShowEditTaskModal] = useState(false);
+  const [taskToEdit, setTaskToEdit] = useState<TaskDTO | null>(null);
 
   const fetchTasks = async () => {
     try {
@@ -49,6 +54,17 @@ export default function TasksPage() {
     setTasks((prev) => prev.filter((task) => task.id !== id));
   };
 
+  const handleEditTask = (task: TaskDTO) => {
+    setTaskToEdit(task);
+    setShowEditTaskModal(true);
+  };
+
+  const handleTaskUpdated = async () => {
+    await fetchTasks();
+    setShowEditTaskModal(false);
+    setTaskToEdit(null);
+  };
+
   return (
     <>
       <Card className="w-full mb-6 rounded-sm">
@@ -69,11 +85,19 @@ export default function TasksPage() {
         tasks={tasks}
         onToggleTask={handleToggleTask}
         onDeleteTask={handleDeleteTask}
+        onEditTask={handleEditTask}
       />
       {showNewTaskModal && (
         <NewTaskModal
           onClose={() => setShowNewTaskModal(false)}
           onTaskCreated={fetchTasks}
+        />
+      )}
+      {showEditTaskModal && taskToEdit && (
+        <EditTaskModal
+          task={taskToEdit}
+          onClose={() => setShowEditTaskModal(false)}
+          onTaskUpdated={handleTaskUpdated}
         />
       )}
     </>

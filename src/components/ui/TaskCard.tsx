@@ -37,7 +37,7 @@ const TaskCard: React.FC<TaskCardProps> = ({
   return (
     <>
       <Card
-        className={`rounded-xl border p-4 ${isCompleted ? "opacity-70" : ""}`}
+        className={`rounded-sm border p-4 ${isCompleted ? "opacity-70" : ""}`}
       >
         <div className="flex items-start justify-between">
           <div className="flex items-center gap-3">

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import TaskCard from "./ui/TaskCard";
 import type { TaskDTO } from "@/types";
 import { Card } from "./ui/card";
@@ -9,6 +9,7 @@ type TodayTasksProps = {
   tasks: TaskDTO[];
   onToggleTask: (id: number) => void;
   onDeleteTask: (id: number) => void;
+  onEditTask: (task: TaskDTO) => void;
 };
 
 const tagColors: Record<string, string> = {
@@ -26,13 +27,8 @@ const TodayTasks: React.FC<TodayTasksProps> = ({
   tasks,
   onToggleTask,
   onDeleteTask,
+  onEditTask,
 }) => {
-  const [expandedTaskId, setExpandedTaskId] = useState<number | null>(null);
-
-  const handleExpand = (id: number) => {
-    setExpandedTaskId(expandedTaskId === id ? null : id);
-  };
-
   const handleDeleteTask = async (task: TaskDTO) => {
     if (task.id === undefined) {
       console.error("Cannot delete task: id is undefined", task);
@@ -70,7 +66,7 @@ const TodayTasks: React.FC<TodayTasksProps> = ({
             onToggleTask={onToggleTask}
             tagColors={tagColors}
             priorityLabels={priorityLabels}
-            onEdit={() => task.id !== undefined && handleExpand(task.id)}
+            onEdit={() => onEditTask(task)}
             onDelete={() => handleDeleteTask(task)}
           />
         ))
