@@ -24,7 +24,7 @@ export function AppRoutes() {
         <Route path="/" element={<Tasks />} /> 
       </Route>
       <Route path="/register" element={<Register />} />
-      <Route path="/today" element={<TodayTasks tasks={[]} onToggleTask={() => {}} />} />
+      <Route path="/today" element={<TodayTasks tasks={[]} onToggleTask={() => {}} onDeleteTask={() => {}} onEditTask={() => {}} />} />
       <Route path="*" element={<Not_Found />} />
     </Routes>
   );
